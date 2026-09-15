@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ARCHI.AI — Software Architecture Generator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #07080d;
+            color: #f5f5f7;
+            font-family: "DM Sans", sans-serif;
+            line-height: 1.5;
+        }
+
+        button,
+        textarea,
+        input {
+            font-family: inherit;
+        }
+
+        /* ================= NAVBAR ================= */
+
+        .navbar {
+            height: 76px;
+            padding: 0 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: rgba(7,8,13,0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .logo-text {
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .logo-text span,
+        .footer-logo span {
+            color: #a855f7;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 35px;
+        }
+
+        .nav-links a {
+            color: #a4a4ad;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: white;
+        }
+
+        .profile {
+            width: 38px;
+            height: 38px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ddd;
+        }
+
+        /* ================= HERO ================= */
+
+        .hero {
+            text-align: center;
+            padding: 90px 20px 65px;
+            background:
+                radial-gradient(circle at 50% 30%, rgba(124,58,237,0.16), transparent 40%);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border: 1px solid rgba(168,85,247,0.35);
+            background: rgba(124,58,237,0.10);
+            border-radius: 50px;
+            color: #c084fc;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 25px;
+        }
+
+        .hero h1 {
+            font-family: "Playfair Display", serif;
+            font-size: clamp(45px, 7vw, 82px);
+            line-height: 1.05;
+            font-weight: 700;
+            max-width: 950px;
+            margin: auto;
+        }
+
+        .hero h1 span {
+            color: #a855f7;
+        }
+
+        .hero p {
+            color: #9999a4;
+            max-width: 650px;
+            margin: 25px auto 0;
+            font-size: 17px;
+        }
+
+        /* ================= GENERATOR ================= */
+
+        .generator-section {
+            width: 90%;
+            max-width: 1250px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background: #101117;
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 20px;
+            padding: 28px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .card-header h2 {
+            font-size: 21px;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            color: #858591;
+            font-size: 13px;
+        }
+
+        .step-number {
+            color: #a855f7;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #92929d;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            margin-bottom: 9px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 145px;
+            resize: vertical;
+            background: #08090e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 15px;
+            color: white;
+            outline: none;
+            font-size: 14px;
+        }
+
+        textarea:focus {
+            border-color: #8b5cf6;
+        }
+
+        textarea::placeholder {
+            color: #5e5e68;
+        }
+
+        .template-select {
+            width: 100%;
+            background: #08090e;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 13px;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124,58,237,0.3);
+        }
+
+        /* ================= OUTPUT ================= */
+
+        .output-card {
+            min-height: 520px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .output-header h2 {
+            font-size: 21px;
+        }
+
+        .status {
+            display: none;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: rgba(34,197,94,0.1);
+            color: #4ade80;
+            font-size: 11px;
+        }
+
+        .empty-output {
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #696974;
+        }
+
+        .empty-icon {
+            font-size: 55px;
+            margin-bottom: 15px;
+        }
+
+        .architecture {
+            display: none;
+        }
+
+        .architecture-title {
+            margin-bottom: 20px;
+        }
+
+        .architecture-title h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .architecture-title p {
+            color: #888893;
+            font-size: 13px;
+        }
+
+        /* ================= FLOWCHART ================= */
+
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            padding: 20px 10px;
+        }
+
+        .flow-node {
+            width: min(90%, 500px);
+            background: #151720;
+            border: 1px solid rgba(168,85,247,0.35);
+            border-radius: 14px;
+            padding: 17px 20px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+        }
+
+        .flow-node .node-label {
+            font-size: 10px;
+            color: #a855f7;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .flow-node strong {
+            font-size: 15px;
+        }
+
+        .flow-node small {
+            display: block;
+            color: #777783;
+            margin-top: 4px;
+            font-size: 11px;
+        }
+
+        .arrow {
+            height: 38px;
+            width: 2px;
+            background: #713f9f;
+            position: relative;
+        }
+
+        .arrow::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: -5px;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #a855f7;
+        }
+
+        .branch {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .branch .flow-node {
+            width: 100%;
+        }
+
+        /* ================= TECHNOLOGIES ================= */
+
+        .tech-section {
+            margin-top: 25px;
+        }
+
+        .tech-section h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .tech {
+            background: #0b0c11;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .tech span {
+            display: block;
+            color: #777783;
+            font-size: 10px;
+            margin-bottom: 3px;
+        }
+
+        .tech strong {
+            font-size: 12px;
+        }
+
+        /* ================= TEMPLATES ================= */
+
+        .templates {
+            width: 90%;
+            max-width: 1250px;
+            margin: 100px auto 0;
+        }
+
+        .section-heading {
+            margin-bottom: 30px;
+        }
+
+        .section-heading > span {
+            color: #a855f7;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+        }
+
+        .section-heading h2 {
+            font-family: "Playfair Display", serif;
+            font-size: 42px;
+            margin-top: 8px;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .template-card {
+            background: #101117;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .template-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168,85,247,0.4);
+        }
+
+        .template-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .template-card h3 {
+            margin-bottom: 8px;
+            font-size: 17px;
+        }
+
+        .template-card p {
+            color: #83838e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .use-template {
+            margin-top: 18px;
+            color: #b77cff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* ================= FEATURES ================= */
+
+        .features {
+            width: 90%;
+            max-width: 1250px;
+            margin: 100px auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .feature-card {
+            background: #101117;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 28px;
+            border-radius: 16px;
+        }
+
+        .feature-number {
+            color: #a855f7;
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+
+        .feature-icon {
+            font-size: 25px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #81818c;
+            font-size: 13px;
+        }
+
+        /* ================= FOOTER ================= */
+
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 30px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #777781;
+            font-size: 12px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .footer-logo .logo-box {
+            width: 30px;
+            height: 30px;
+            font-size: 15px;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+
+            .generator-section {
+                grid-template-columns: 1fr;
+            }
+
+            .template-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .branch {
+                grid-template-columns: 1fr;
+            }
+
+            .tech-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .hero {
+                padding-top: 60px;
+            }
+
+            .hero h1 {
+                font-size: 45px;
+            }
+
+            .section-heading h2 {
+                font-size: 32px;
+            }
+
+            footer {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="logo-container">
+        <div class="logo-box">A</div>
+
+        <div class="logo-text">
+            ARCHI<span>.AI</span>
+        </div>
+    </div>
+
+    <nav class="nav-links">
+        <a href="#" class="active">Generator</a>
+        <a href="#templates">Templates</a>
+        <a href="#features">Features</a>
+    </nav>
+
+    <div class="profile">
+        A
+    </div>
+
+</header>
+
+
+<!-- ================= HERO ================= -->
+
+<main>
+
+<section class="hero">
+
+    <div class="badge">
+        ✦ AI-POWERED ARCHITECTURE
+    </div>
+
+    <h1>
+        Build your software
+        <br>
+        <span>architecture in seconds.</span>
+    </h1>
+
+    <p>
+        Describe your software idea and let ARCHI.AI transform
+        it into a clear, scalable software architecture.
+    </p>
+
+</section>
+
+
+<!-- ================= GENERATOR ================= -->
+
+<section class="generator-section">
+
+    <!-- LEFT SIDE -->
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <div>
+                <h2>Project Brief</h2>
+                <p>Tell us what you're building</p>
+            </div>
+
+            <span class="step-number">
+                01
+            </span>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                PROJECT DESCRIPTION
+            </label>
+
+            <textarea
+                id="projectDescription"
+                placeholder="Example: Build an online food delivery application where users can order food from restaurants..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                CHOOSE TEMPLATE
+            </label>
+
+            <select
+                class="template-select"
+                id="templateSelect"
+            >
+
+                <option value="">
+                    Select a template
+                </option>
+
+                <option value="ecommerce">
+                    E-Commerce Platform
+                </option>
+
+                <option value="food">
+                    Food Delivery
+                </option>
+
+                <option value="social">
+                    Social Media Platform
+                </option>
+
+                <option value="banking">
+                    Banking Application
+                </option>
+
+                <option value="education">
+                    Education Platform
+                </option>
+
+                <option value="healthcare">
+                    Healthcare System
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="generate-btn"
+            id="generateBtn"
+            type="button"
+        >
+            ✦ Generate Architecture
+        </button>
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+
+    <div class="card output-card">
+
+        <div class="output-header">
+
+            <h2>
+                Generated Architecture
+            </h2>
+
+            <span
+                class="status"
+                id="status"
+            >
+                ✓ Generated
+            </span>
+
+        </div>
+
+
+        <!-- EMPTY -->
+
+        <div
+            class="empty-output"
+            id="emptyOutput"
+        >
+
+            <div>
+
+                <div class="empty-icon">
+                    ◇
+                </div>
+
+                <h3>
+                    Your architecture will appear here
+                </h3>
+
+                <p>
+                    Enter a project description or choose a template
+                    to generate your architecture.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- ARCHITECTURE -->
+
+        <div
+            class="architecture"
+            id="architecture"
+        >
+
+            <div class="architecture-title">
+
+                <h3 id="architectureName">
+                    Software Architecture
+                </h3>
+
+                <p id="architectureDescription">
+                    Generated architecture flow
+                </p>
+
+            </div>
+
+
+            <!-- FLOWCHART -->
+
+            <div class="flowchart">
+
+                <div class="flow-node">
+
+                    <div class="node-label">
+                        USER
+                    </div>
+
+                    <strong>
+                        Client Application
+                    </strong>
+
+                    <small>
+                        Web / Mobile Interface
+                    </small>
+
+                </div>
+
+
+                <div class="arrow"></div>
+
+
+                <div class="flow-node">
+
+                    <div class="node-label">
+                        FRONTEND
+                    </div>
+
+                    <strong>
+                        Presentation Layer
+                    </strong>
+
+                    <small>
+                        HTML • CSS • JavaScript / React
+                    </small>
+
+                </div>
+
+
+                <div class="arrow"></div>
+
+
+                <div class="flow-node">
+
+                    <div class="node-label">
+                        API
+                    </div>
+
+                    <strong>
+                        Backend Server
+                    </strong>
+
+                    <small>
+                        Node.js • Express.js
+                    </small>
+
+                </div>
+
+
+                <div class="arrow"></div>
+
+
+                <div class="branch">
+
+                    <div class="flow-node">
+
+                        <div class="node-label">
+                            SERVICE
+                        </div>
+
+                        <strong>
+                            Business Logic
+                        </strong>
+
+                        <small>
+                            Authentication & Processing
+                        </small>
+
+                    </div>
+
+
+                    <div class="flow-node">
+
+                        <div class="node-label">
+                            DATABASE
+                        </div>
+
+                        <strong>
+                            Data Storage
+                        </strong>
+
+                        <small>
+                            MongoDB / PostgreSQL
+                        </small>
+
+                    </div>
+
+
+                    <div class="flow-node">
+
+                        <div class="node-label">
+                            EXTERNAL
+                        </div>
+
+                        <strong>
+                            Third-Party APIs
+                        </strong>
+
+                        <small>
+                            Payment / Notification
+                        </small>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- TECHNOLOGIES -->
+
+            <div class="tech-section">
+
+                <h3>
+                    Recommended Technology Stack
+                </h3>
+
+                <div class="tech-grid">
+
+                    <div class="tech">
+                        <span>FRONTEND</span>
+                        <strong id="frontendTech">
+                            HTML / CSS / JavaScript
+                        </strong>
+                    </div>
+
+                    <div class="tech">
+                        <span>BACKEND</span>
+                        <strong>
+                            Node.js + Express
+                        </strong>
+                    </div>
+
+                    <div class="tech">
+                        <span>DATABASE</span>
+                        <strong id="databaseTech">
+                            MongoDB
+                        </strong>
+                    </div>
+
+                    <div class="tech">
+                        <span>API</span>
+                        <strong>
+                            REST API
+                        </strong>
+                    </div>
+
+                    <div class="tech">
+                        <span>SECURITY</span>
+                        <strong>
+                            JWT Authentication
+                        </strong>
+                    </div>
+
+                    <div class="tech">
+                        <span>DEPLOYMENT</span>
+                        <strong>
+                            Cloud Hosting
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TEMPLATES ================= -->
+
+<section
+    class="templates"
+    id="templates"
+>
+
+    <div class="section-heading">
+
+        <span>
+            QUICK START
+        </span>
+
+        <h2>
+            Architecture Templates
+        </h2>
+
+    </div>
+
+
+    <div class="template-grid">
+
+
+        <div
+            class="template-card"
+            data-template="ecommerce"
+        >
+
+            <div class="template-icon">
+                🛒
+            </div>
+
+            <h3>
+                E-Commerce
+            </h3>
+
+            <p>
+                Online shopping system with products,
+                cart, orders, payments and users.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+
+        <div
+            class="template-card"
+            data-template="food"
+        >
+
+            <div class="template-icon">
+                🍔
+            </div>
+
+            <h3>
+                Food Delivery
+            </h3>
+
+            <p>
+                Restaurant ordering platform with
+                customers, restaurants, delivery and payments.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+
+        <div
+            class="template-card"
+            data-template="social"
+        >
+
+            <div class="template-icon">
+                💬
+            </div>
+
+            <h3>
+                Social Media
+            </h3>
+
+            <p>
+                Social networking platform with profiles,
+                posts, messages, likes and notifications.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+
+        <div
+            class="template-card"
+            data-template="banking"
+        >
+
+            <div class="template-icon">
+                💳
+            </div>
+
+            <h3>
+                Banking System
+            </h3>
+
+            <p>
+                Secure banking application with accounts,
+                transactions, authentication and payments.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+
+        <div
+            class="template-card"
+            data-template="education"
+        >
+
+            <div class="template-icon">
+                🎓
+            </div>
+
+            <h3>
+                Education Platform
+            </h3>
+
+            <p>
+                Learning management system with courses,
+                students, instructors and assessments.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+
+        <div
+            class="template-card"
+            data-template="healthcare"
+        >
+
+            <div class="template-icon">
+                🏥
+            </div>
+
+            <h3>
+                Healthcare
+            </h3>
+
+            <p>
+                Healthcare management system with patients,
+                doctors, appointments and medical records.
+            </p>
+
+            <div class="use-template">
+                USE TEMPLATE →
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FEATURES ================= -->
+
+<section
+    class="features"
+    id="features"
+>
+
+    <div class="section-heading">
+
+        <span>
+            WHY ARCHI.AI
+        </span>
+
+        <h2>
+            From idea to architecture.
+        </h2>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+        <div class="feature-card">
+
+            <div class="feature-number">
+                01
+            </div>
+
+            <div class="feature-icon">
+                ✦
+            </div>
+
+            <h3>
+                AI Architecture
+            </h3>
+
+            <p>
+                Convert natural-language project ideas
+                into structured software architecture.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-number">
+                02
+            </div>
+
+            <div class="feature-icon">
+                ◇
+            </div>
+
+            <h3>
+                Smart Recommendations
+            </h3>
+
+            <p>
+                Get recommendations for databases,
+                APIs, services and infrastructure.
+            </p>
+
+        </div>
+
+
+        <div class="feature-card">
+
+            <div class="feature-number">
+                03
+            </div>
+
+            <div class="feature-icon">
+                ↓
+            </div>
+
+            <h3>
+                Visual Flowchart
+            </h3>
+
+            <p>
+                Understand the generated architecture
+                through a simple visual flowchart.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-logo">
+
+        <div class="logo-box">
+            A
+        </div>
+
+        <strong>
+            ARCHI<span>.AI</span>
+        </strong>
+
+    </div>
+
+    <p>
+        AI-powered software architecture generation.
+    </p>
+
+    <div>
+        © 2026 ARCHI.AI
+    </div>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+    /* =========================================
+       TEMPLATE DATA
+    ========================================= */
+
+    const templateData = {
+
+        ecommerce: {
+            name: "E-Commerce Platform",
+            description: "Scalable architecture for an online shopping platform.",
+            text: "Build an e-commerce platform where users can browse products, add products to cart, place orders and make payments.",
+            database: "MongoDB"
+        },
+
+        food: {
+            name: "Food Delivery System",
+            description: "Architecture for restaurant ordering and delivery.",
+            text: "Build a food delivery application where customers can browse restaurants, order food, make payments and track delivery.",
+            database: "PostgreSQL"
+        },
+
+        social: {
+            name: "Social Media Platform",
+            description: "Architecture for a scalable social networking application.",
+            text: "Build a social media platform where users can create profiles, share posts, like posts, comment and communicate.",
+            database: "MongoDB"
+        },
+
+        banking: {
+            name: "Banking Application",
+            description: "Secure architecture for digital banking services.",
+            text: "Build a banking application where users can manage accounts, transfer money, view transactions and make payments.",
+            database: "PostgreSQL"
+        },
+
+        education: {
+            name: "Education Platform",
+            description: "Architecture for an online learning management system.",
+            text: "Build an education platform where students can enroll in courses, watch lessons, complete assignments and track progress.",
+            database: "PostgreSQL"
+        },
+
+        healthcare: {
+            name: "Healthcare Management System",
+            description: "Architecture for managing patients, doctors and appointments.",
+            text: "Build a healthcare application where patients can book appointments, doctors can manage schedules and users can access medical information.",
+            database: "PostgreSQL"
+        }
+
+    };
+
+
+    /* =========================================
+       GET HTML ELEMENTS
+    ========================================= */
+
+    const descriptionInput =
+        document.getElementById("projectDescription");
+
+    const templateSelect =
+        document.getElementById("templateSelect");
+
+    const generateBtn =
+        document.getElementById("generateBtn");
+
+    const emptyOutput =
+        document.getElementById("emptyOutput");
+
+    const architecture =
+        document.getElementById("architecture");
+
+    const status =
+        document.getElementById("status");
+
+    const architectureName =
+        document.getElementById("architectureName");
+
+    const architectureDescription =
+        document.getElementById("architectureDescription");
+
+    const databaseTech =
+        document.getElementById("databaseTech");
+
+
+    /* =========================================
+       TEMPLATE SELECT
+    ========================================= */
+
+    templateSelect.addEventListener("change", function () {
+
+        const selected =
+            templateSelect.value;
+
+        if (!selected) {
+            return;
+        }
+
+        const data =
+            templateData[selected];
+
+        descriptionInput.value =
+            data.text;
+
+    });
+
+
+    /* =========================================
+       TEMPLATE CARDS
+    ========================================= */
+
+    document.querySelectorAll(".template-card")
+        .forEach(function (card) {
+
+            card.addEventListener("click", function () {
+
+                const selected =
+                    card.getAttribute("data-template");
+
+                const data =
+                    templateData[selected];
+
+                templateSelect.value =
+                    selected;
+
+                descriptionInput.value =
+                    data.text;
+
+                document.querySelector(".generator-section")
+                    .scrollIntoView({
+                        behavior: "smooth"
+                    });
+
+            });
+
+        });
+
+
+    /* =========================================
+       GENERATE ARCHITECTURE
+    ========================================= */
+
+    generateBtn.addEventListener("click", function () {
+
+        const description =
+            descriptionInput.value.trim();
+
+        const selectedTemplate =
+            templateSelect.value;
+
+
+        if (!description && !selectedTemplate) {
+
+            alert(
+                "Please enter a project description or select a template."
+            );
+
+            return;
+        }
+
+
+        let projectName =
+            "Custom Software Architecture";
+
+        let projectDescription =
+            "Architecture generated from your project description.";
+
+        let database =
+            "MongoDB";
+
+
+        if (selectedTemplate) {
+
+            const data =
+                templateData[selectedTemplate];
+
+            projectName =
+                data.name;
+
+            projectDescription =
+                data.description;
+
+            database =
+                data.database;
+
+        }
+
+
+        if (description && !selectedTemplate) {
+
+            projectName =
+                "AI Generated Software Architecture";
+
+        }
+
+
+        /* Show generated result */
+
+        emptyOutput.style.display =
+            "none";
+
+        architecture.style.display =
+            "block";
+
+        status.style.display =
+            "inline-block";
+
+
+        architectureName.textContent =
+            projectName;
+
+        architectureDescription.textContent =
+            projectDescription;
+
+        databaseTech.textContent =
+            database;
+
+
+        /* Scroll to result */
+
+        setTimeout(function () {
+
+            architecture.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+
+        }, 100);
+
+    });
+
+
+</script>
+
+</body>
+</html>
