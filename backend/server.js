@@ -3,15 +3,11 @@ const cors = require("cors");
 const path = require("path");
 require("dotenv").config();
 
-const OpenAI = require("openai");
+const ArchitectureService = require("./ArchitectureService");
+const architectureService = new ArchitectureService();
 
 const app = express();
 const PORT = 5000;
-
-// OpenAI client
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
 
 // Middleware
 app.use(cors());
@@ -62,68 +58,20 @@ app.post("/api/generate", async (req, res) => {
             });
         }
 
-        if (!process.env.OPENAI_API_KEY) {
-            return res.status(500).json({
-                success: false,
-                error: "OpenAI API key is missing."
-            });
-        }
+        
 
-        const prompt = `
-You are ARCHI.AI, an expert software architect.
+console.log("Sending request to ArchitectureService...");
 
-Create a complete software architecture for this project.
-
-PROJECT DESCRIPTION:
-${description}
-
-ARCHITECTURE TYPE:
-${architectureType || "Not specified"}
-
-EXPECTED SCALE:
-${scale || "Not specified"}
-
-DEPLOYMENT:
-${deployment || "Not specified"}
-
-KEY REQUIREMENTS:
-${
-    requirements && requirements.length > 0
-        ? requirements.join(", ")
-        : "Not specified"
-}
-
-Return the architecture using these sections:
-
-1. PROJECT OVERVIEW
-2. RECOMMENDED TECHNOLOGY STACK
-3. FRONTEND ARCHITECTURE
-4. BACKEND ARCHITECTURE
-5. DATABASE DESIGN
-6. API ENDPOINTS
-7. AUTHENTICATION AND AUTHORIZATION
-8. MAIN SERVICES / COMPONENTS
-9. SYSTEM DATA FLOW
-10. DEPLOYMENT ARCHITECTURE
-11. SECURITY CONSIDERATIONS
-12. SCALABILITY
-13. FUTURE IMPROVEMENTS
-
-Keep the explanation clear and professional.
-This is for a college software project.
-Explain why the recommended technologies are suitable.
-`;
-
-        console.log("Sending request to OpenAI...");
-
-        const response = await client.responses.create({
-            model: "gpt-5.6-luna",
-            input: prompt
-        });
+const architecture = await architectureService.generateArchitecture({
+    description,
+    architectureType,
+    scale,
+    deployment,
+    requirements
+});
 
         console.log("AI RESPONSE RECEIVED");
 
-        const architecture = response.output_text;
 
         if (!architecture) {
             return res.status(500).json({

@@ -1431,97 +1431,84 @@
 
 
     /* =========================================
-       GENERATE ARCHITECTURE
+       
     ========================================= */
 
-    generateBtn.addEventListener("click", function () {
+    
+generateBtn.addEventListener("click", async function () {
+    const description = descriptionInput.value.trim();
+    const selectedTemplate = templateSelect.value;
 
-        const description =
-            descriptionInput.value.trim();
+    if (!description) {
+        alert("Please enter a project description or select a template.");
+        return;
+    }
 
-        const selectedTemplate =
-            templateSelect.value;
+    const data = templateData[selectedTemplate] || {};
 
+    generateBtn.disabled = true;
+    generateBtn.textContent = "Generating...";
 
-        if (!description && !selectedTemplate) {
+    try {
+        const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                description: description,
+                architectureType: "web",
+                scale: "Medium",
+                deployment: "Cloud",
+                requirements: []
+            })
+        });
 
-            alert(
-                "Please enter a project description or select a template."
-            );
+        const result = await response.json();
 
-            return;
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || "Architecture generation failed.");
         }
 
-
-        let projectName =
-            "Custom Software Architecture";
-
-        let projectDescription =
-            "Architecture generated from your project description.";
-
-        let database =
-            "MongoDB";
-
-
-        if (selectedTemplate) {
-
-            const data =
-                templateData[selectedTemplate];
-
-            projectName =
-                data.name;
-
-            projectDescription =
-                data.description;
-
-            database =
-                data.database;
-
-        }
-
-
-        if (description && !selectedTemplate) {
-
-            projectName =
-                "AI Generated Software Architecture";
-
-        }
-
-
-        /* Show generated result */
-
-        emptyOutput.style.display =
-            "none";
-
-        architecture.style.display =
-            "block";
-
-        status.style.display =
-            "inline-block";
-
+        emptyOutput.style.display = "none";
+        architecture.style.display = "block";
+        status.style.display = "inline-block";
 
         architectureName.textContent =
-            projectName;
+            data.name || "Generated Software Architecture";
 
         architectureDescription.textContent =
-            projectDescription;
+            data.description || "Architecture generated from your project description.";
 
-        databaseTech.textContent =
-            database;
+        databaseTech.textContent = "SQLite / PostgreSQL";
 
+        let outputText = document.getElementById("architectureText");
 
-        /* Scroll to result */
+        if (!outputText) {
+            outputText = document.createElement("pre");
+            outputText.id = "architectureText";
+            outputText.style.whiteSpace = "pre-wrap";
+            outputText.style.overflowWrap = "anywhere";
+            outputText.style.marginTop = "20px";
+            architecture.appendChild(outputText);
+        }
 
-        setTimeout(function () {
+        outputText.textContent = result.architecture;
+        outputText.style.display = "block";
 
-            architecture.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest"
-            });
+        architecture.scrollIntoView({
+            behavior: "smooth",
+            block: "nearest"
+        });
 
-        }, 100);
+    } catch (error) {
+        alert(error.message);
+    } finally {
+        generateBtn.disabled = false;
+        generateBtn.textContent = "✦ Generate Architecture";
+    }
+});
 
-    });
 
 
 </script>
