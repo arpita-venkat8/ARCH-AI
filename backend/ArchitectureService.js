@@ -1,7 +1,12 @@
 
 const ArchitectureFactory = require("./patterns/ArchitectureFactory");
+const { GoogleGenAI } = require("@google/genai");
 
 class ArchitectureService {
+    constructor() {
+        this.ai = null;
+    }
+
     async generateArchitecture({
         description,
         architectureType,
@@ -9,6 +14,18 @@ class ArchitectureService {
         deployment,
         requirements
     }) {
+        const apiKey = process.env.GEMINI_API_KEY;
+
+        if (!apiKey) {
+            throw new Error(
+                "Gemini API key is missing. Add GEMINI_API_KEY to backend/.env."
+            );
+        }
+
+        if (!this.ai) {
+            this.ai = new GoogleGenAI({ apiKey });
+        }
+
         const strategy = ArchitectureFactory.createStrategy(
             architectureType
         );
@@ -18,65 +35,69 @@ class ArchitectureService {
             deployment
         });
 
-        return `
-ARCHI.AI - SOFTWARE ARCHITECTURE
+        const prompt = `
+You are ARCHI.AI, a software architecture design assistant.
 
-1. PROJECT OVERVIEW
-Project: ${description}
+Create a detailed, project-specific software architecture report.
+Use Markdown headings and clear explanations.
 
-2. RECOMMENDED TECHNOLOGY STACK
-Frontend: HTML, CSS, JavaScript
-Backend: Node.js and Express
-Database: Choose SQLite for a small project or PostgreSQL for a larger project.
+PROJECT DESCRIPTION:
+${description}
 
-3. FRONTEND ARCHITECTURE
-Create reusable UI components and validate user inputs.
+ARCHITECTURE TYPE:
+${architectureType || "Web"}
 
-4. BACKEND ARCHITECTURE
-Use Express routes to handle requests and a service layer for business logic.
+EXPECTED SCALE:
+${scale || "Medium"}
 
-5. DATABASE DESIGN
-Design tables based on the project's data and relationships.
+DEPLOYMENT:
+${deployment || "Cloud"}
 
-6. API ENDPOINTS
-GET /api/test - Check backend status
-POST /api/generate - Generate architecture
+ADDITIONAL REQUIREMENTS:
+${requirements && requirements.length
+    ? requirements.join(", ")
+    : "No additional requirements specified."}
 
-7. AUTHENTICATION AND AUTHORIZATION
-Use secure authentication and role-based access where required.
-
-8. MAIN SERVICES / COMPONENTS
-Separate frontend, API routes, services, and data storage.
-
-9. SYSTEM DATA FLOW
-User -> Frontend -> Backend -> ArchitectureService -> Architecture output.
-
-10. DEPLOYMENT ARCHITECTURE
-Deploy the frontend and backend to a suitable hosting platform.
-
-11. SECURITY CONSIDERATIONS
-Validate inputs, protect secrets, and use HTTPS in production.
-
-12. SCALABILITY
-Add caching, database indexing, and load balancing when needed.
-
-13. FUTURE IMPROVEMENTS
-Add real AI integration, automated tests, and monitoring.
-
-ARCHITECTURE TYPE: ${architectureType || "Not specified"}
-EXPECTED SCALE: ${scale || "Not specified"}
-DEPLOYMENT: ${deployment || "Not specified"}
-REQUIREMENTS: ${
-            requirements && requirements.length
-                ? requirements.join(", ")
-                : "Not specified"
-        }
-
-GENERATION STRATEGY:
+DESIGN STRATEGY:
 ${instructions}
 
-NOTE: This is sample-generated output. No AI API was called.
+Include these sections:
+1. Project Overview
+2. Recommended Technology Stack, with reasons
+3. Frontend Architecture
+4. Backend Architecture
+5. Database Design, including suggested entities or tables
+6. API Endpoints, with methods and purposes
+7. Authentication and Authorization
+8. Main Services and Components
+9. System Data Flow
+10. Deployment Architecture
+11. Security Considerations
+12. Scalability and Performance
+13. Design Patterns Used
+14. Future Improvements
+
+Make every section relevant to the actual project.
+Explain important component responsibilities and how they interact.
+Do not claim that code has been implemented or tested.
+If a detail is unknown, state a reasonable assumption instead of
+presenting it as a confirmed fact.
 `;
+
+        const response = await this.ai.models.generateContent({
+            model: "gemini-3.1-flash-lite",
+            contents: prompt
+        });
+
+        const architecture = response.text;
+
+        if (!architecture || !architecture.trim()) {
+            throw new Error(
+                "Gemini returned an empty response. Please try again."
+            );
+        }
+
+        return architecture.trim();
     }
 }
 

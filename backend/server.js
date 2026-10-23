@@ -70,7 +70,7 @@ const architecture = await architectureService.generateArchitecture({
     requirements
 });
 
-        console.log("AI RESPONSE RECEIVED");
+        console.log("GEMINI RESPONSE RECEIVED");
 
 
         if (!architecture) {
@@ -95,7 +95,7 @@ const architecture = await architectureService.generateArchitecture({
 
         console.error("");
         console.error("================================");
-        console.error("OPENAI ERROR");
+        console.error("GEMINI API ERROR");
         console.error("================================");
         console.error(error.message);
 
